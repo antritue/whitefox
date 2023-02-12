@@ -49,6 +49,13 @@ functions:
       - httpApi:
           path: /{id}
           method: get
+  list:
+    handler: src/functions/list.list
+    name: list-device
+    events:
+      - httpApi:
+          path: /
+          method: get
 
 resources:
   Resources:
