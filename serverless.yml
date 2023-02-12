@@ -1,0 +1,71 @@
+service: whitefox-nodejs-serverless
+frameworkVersion: '3'
+
+custom:
+  tableName: 'device-table'
+  dynamodb:
+    start:
+      migrate: true
+      inMemory: true
+      port: 8000
+    stages:
+      - dev
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: ap-southeast-1
+  iam:
+    role:
+      statements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DescribeTable
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+        Resource:
+          - "Fn::GetAtt": [myTable, Arn]
+
+  environment:
+    TABLE_NAME: ${self:custom.tableName}
+
+functions:
+  create:
+    handler: src/functions/create.create
+    name: create-device
+    events:
+      - httpApi:
+          path: /
+          method: post
+  get:
+    handler: src/functions/get.get
+    name: get-device
+    events:
+      - httpApi:
+          path: /{id}
+          method: get
+
+resources:
+  Resources:
+    myTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
