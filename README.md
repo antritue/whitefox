@@ -1,92 +1,202 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in NodeJS'
-description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.'
-layout: Doc
-framework: v3
-platform: AWS
-language: nodeJS
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
 
-# Serverless Framework Node HTTP API on AWS
+# Whitefox technical test
 
-This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.
+A simple Restful API (GET and POST) build with Node.js, Serverless Framework, DynamoDB and AWS Lambda
 
-This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes Typescript, Mongo, DynamoDB and other examples.
 
-## Usage
+## Features
 
-### Deployment
+- AWS SDK v3 with separate package for each service
+- [Joi](https://joi.dev/) for validation
 
-```
-$ serverless deploy
-```
 
-After deploying, you should see output similar to:
+## Run Locally
+
+Clone the project
 
 ```bash
-Deploying aws-node-http-api-project to stage dev (us-east-1)
-
-✔ Service deployed to stack aws-node-http-api-project-dev (152s)
-
-endpoint: GET - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/
-functions:
-  hello: aws-node-http-api-project-dev-hello (1.9 kB)
+  git@github.com:antritue/whitefox.git
 ```
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [http event docs](https://www.serverless.com/framework/docs/providers/aws/events/apigateway/).
-
-### Invocation
-
-After successful deployment, you can call the created application via HTTP:
+Go to the project directory
 
 ```bash
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
+  cd whitefox
 ```
 
-Which should result in response similar to the following (removed `input` content for brevity):
+Install dependencies
 
-```json
+```bash
+  npm install
+```
+
+Install DynamoDB Local
+
+```bash
+  serverless dynamodb install
+```
+
+Download [Java Runtime Engine](https://www.java.com/en/download/manual.jsp) in order to run DynamoDB locally. [Issue comment](https://github.com/99x/serverless-dynamodb-local/issues/210#issuecomment-486700221)
+
+Uncomment `region` and `endpoint` in `db.js`
+
+```javascript
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const client = new DynamoDBClient({
+    // region: 'localhost',
+    // endpoint: 'http://localhost:8000',
+});
+module.exports = client;
+```
+
+Start the server
+
+```bash
+  npm start
+```
+
+
+## Deployment
+
+To deploy this project you need to setup aws credentials (`aws_access_key_id` and `aws_secret_access_key`). Use [this link](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html) as reference
+
+Comment out `region` and `endpoint` in `db.js`
+
+```javascript
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const client = new DynamoDBClient({
+    // region: 'localhost',
+    // endpoint: 'http://localhost:8000',
+});
+module.exports = client;
+```
+
+Choose your `region` in `serverless.yml`
+
+```bash
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: ap-southeast-1
+```
+
+Run this command
+```bash
+npm run deploy
+```
+Application is avalable to test via this API endpoint
+
+
+## API Reference
+
+#### Get all devices
+
+```http
+GET /
+```
+Response
+
+```http
+Status: 200 OK
 {
-  "message": "Go Serverless v2.0! Your function executed successfully!",
-  "input": {
-    ...
-  }
+	"message": "Successfully retrieved all devices.",
+	"data": [
+		{
+			"name": "Sensor",
+			"note": "Testing a sensor.",
+			"deviceModel": "Model 2",
+			"id": "1c892f1d-0279-4877-ab8b-cd1bfc8dbea7",
+			"serial": "A0400102"
+		},
+		{
+			"name": "Sensor",
+			"note": "Testing a sensor.",
+			"deviceModel": "Model 1",
+			"id": "8b0a429c-9c47-404b-b749-529137d4c2ea",
+			"serial": "A0400102"
+		}
+	]
 }
 ```
 
-### Local development
+#### Get a device by id
 
-You can invoke your function locally by using the following command:
-
-```bash
-serverless invoke local --function hello
+```http
+GET /{id}
 ```
 
-Which should result in response similar to the following:
+Response
 
-```
+```http
+Status: 200 OK
 {
-  "statusCode": 200,
-  "body": "{\n  \"message\": \"Go Serverless v3.0! Your function executed successfully!\",\n  \"input\": \"\"\n}"
+	"message": "Successfully retrieved device.",
+	"data": {
+		"name": "Sensor",
+		"note": "Testing a sensor.",
+		"deviceModel": "Model 2",
+		"id": "1c892f1d-0279-4877-ab8b-cd1bfc8dbea7",
+		"serial": "A0400102"
+	}
 }
 ```
 
-
-Alternatively, it is also possible to emulate API Gateway and Lambda locally by using `serverless-offline` plugin. In order to do that, execute the following command:
-
-```bash
-serverless plugin install -n serverless-offline
+```http
+Status: 404 Not Found
+{
+	"message": "ID does not exist."
+}
 ```
 
-It will add the `serverless-offline` plugin to `devDependencies` in `package.json` file as well as will add it to `plugins` in `serverless.yml`.
-
-After installation, you can start local emulation with:
-
+```http
+Status: 500 Internal Server Error
+{
+	"message": "Failed to get device.",
+	"errorMessage": "Invalid table/index name.  Table/index names must be between 3 and 255 characters long, and may contain only the characters a-z, A-Z, 0-9, '_', '-', and '.'"
+}
 ```
-serverless offline
+
+#### Create a new device
+
+```http
+POST /
+
+{
+  "deviceModel": "Model",
+  "name": "Sensor",
+  "note": "Testing a sensor.",
+  "serial": "A0400102"
+}
 ```
 
-To learn more about the capabilities of `serverless-offline`, please refer to its [GitHub repository](https://github.com/dherault/serverless-offline).
+Response
+
+```http
+Status: 200 OK
+{
+	"message": "Successfully created device.",
+	"data": {
+		"id": "41091b9f-02ad-4337-b4dc-eae0037036b2",
+		"deviceModel": "Model",
+		"name": "Sensor",
+		"note": "Testing a sensor.",
+		"serial": "A0400102"
+	}
+}
+```
+
+```http
+Status: 400 Bad Request
+{
+	"error": "\"serial\" is not allowed to be empty"
+}
+```
+
+```http
+Status: 500 Internal Server Error
+{
+	"message": "Failed to get device.",
+	"errorMessage": "Invalid table/index name.  Table/index names must be between 3 and 255 characters long, and may contain only the characters a-z, A-Z, 0-9, '_', '-', and '.'"
+}
+```
