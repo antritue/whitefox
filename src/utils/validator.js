@@ -4,6 +4,7 @@ const validator = (schema) => (payload) =>
   schema.validate(payload, { abortEarly: false });
 
 const deviceSchema = Joi.object({
+  id: Joi.string(),
   deviceModel: Joi.string().required(),
   name: Joi.string().required(),
   note: Joi.string().required(),

@@ -19,7 +19,7 @@ module.exports.create = async (event) => {
             };
         }
 
-        const id = crypto.randomUUID()
+        const id = body.id ? body.id : crypto.randomUUID()
         const params = {
             TableName: process.env.TABLE_NAME,
             Item: marshall({
@@ -32,7 +32,7 @@ module.exports.create = async (event) => {
 
         response.body = JSON.stringify({
             message: "Successfully created device.",
-            data: {id, ...value},
+            data: { id, ...value },
         });
     } catch (e) {
         console.error(e);
