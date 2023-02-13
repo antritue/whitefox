@@ -40,21 +40,21 @@ functions:
     name: create-device
     events:
       - httpApi:
-          path: /
+          path: /api/devices
           method: post
   get:
     handler: src/functions/get.get
     name: get-device
     events:
       - httpApi:
-          path: /{id}
+          path: /api/devices/{id}
           method: get
   list:
     handler: src/functions/list.list
     name: list-device
     events:
       - httpApi:
-          path: /
+          path: /api/devices
           method: get
 
 resources:

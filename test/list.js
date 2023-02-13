@@ -1,7 +1,6 @@
 const list = require('../src/functions/list')
 const eventGenerator = require('./eventGenerator')
 
-
 module.exports.listTest = () =>{
     describe('should list all items in table', () => {
 
