@@ -6,8 +6,9 @@ A simple Restful API (GET and POST) build with Node.js, Serverless Framework, Dy
 
 ## Features
 
-- AWS SDK v3 with separate package for each service
+- [AWS SDK v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-dynamodb/index.html) with separate package for each service
 - [Joi](https://joi.dev/) for validation
+- [Jest](https://jestjs.io/) for testing
 
 
 ## Run Locally
@@ -56,47 +57,14 @@ Start the server
 ```
 
 
-## Deployment
-
-To deploy this project you need to setup aws credentials (`aws_access_key_id` and `aws_secret_access_key`). Use [this link](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html) as reference
-
-Comment out `region` and `endpoint` in `db.js`
-
-```javascript
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const client = new DynamoDBClient({
-    // region: 'localhost',
-    // endpoint: 'http://localhost:8000',
-});
-module.exports = client;
-```
-
-Choose your `region` in `serverless.yml`
-
-```bash
-provider:
-  name: aws
-  runtime: nodejs18.x
-  stage: dev
-  region: ap-southeast-1
-```
-
-Run this command
-```bash
-npm run deploy
-```
-Application is avalable to test via this API endpoint
-
-
 ## API Reference
 
-The base URL for the API is https://pnuo5uc6j8.execute-api.ap-southeast-1.amazonaws.com/.
-
+The base URL for the API is https://pnuo5uc6j8.execute-api.ap-southeast-1.amazonaws.com/api/devices .
 
 #### Get all devices
 
 ```http
-GET /
+GET /api/devices 
 ```
 Response
 
@@ -126,7 +94,7 @@ Status: 200 OK
 #### Get a device by id
 
 ```http
-GET /{id}
+GET /api/devices/{id}
 ```
 
 Response
@@ -163,7 +131,7 @@ Status: 500 Internal Server Error
 #### Create a new device
 
 ```http
-POST /
+POST /api/devices 
 
 {
   "deviceModel": "Model",
@@ -203,3 +171,51 @@ Status: 500 Internal Server Error
 	"errorMessage": "Invalid table/index name.  Table/index names must be between 3 and 255 characters long, and may contain only the characters a-z, A-Z, 0-9, '_', '-', and '.'"
 }
 ```
+## Running Tests
+
+Set up ENV variable for DynamoDB in terminal
+
+```bash
+  $env:TABLE_NAME='device-table'
+```
+Start DynamoDB locally
+```bash
+  serverless dynamodb start -p 8000
+```
+
+To run tests, open another terminal, run the following command
+
+```bash
+  npm run test
+```
+## Deployment
+
+To deploy this project you need to setup aws credentials (`aws_access_key_id` and `aws_secret_access_key`). Use [this link](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html) as reference
+
+Comment out `region` and `endpoint` in `db.js`
+
+```javascript
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const client = new DynamoDBClient({
+    // region: 'localhost',
+    // endpoint: 'http://localhost:8000',
+});
+module.exports = client;
+```
+
+Choose your `region` in `serverless.yml`
+
+```bash
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: ap-southeast-1
+```
+
+Run this command
+```bash
+npm run deploy
+```
+Application is avalable to test via this API endpoint: https://pnuo5uc6j8.execute-api.ap-southeast-1.amazonaws.com/api/devices 
+
