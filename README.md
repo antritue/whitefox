@@ -90,6 +90,9 @@ Application is avalable to test via this API endpoint
 
 ## API Reference
 
+The base URL for the API is https://pnuo5uc6j8.execute-api.ap-southeast-1.amazonaws.com/.
+
+
 #### Get all devices
 
 ```http
