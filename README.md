@@ -11,6 +11,10 @@ A simple Restful API (GET and POST) build with Node.js, Serverless Framework, Dy
 - [Jest](https://jestjs.io/) for testing
 
 
+## Prerequisites
+
+- Node.js 18.x (v18.14.1)
+- Download [Java Runtime Engine](https://www.java.com/en/download/manual.jsp) in order to run DynamoDB locally. [Issue comment](https://github.com/99x/serverless-dynamodb-local/issues/210#issuecomment-486700221)
 ## Run Locally
 
 Clone the project
@@ -36,8 +40,6 @@ Install DynamoDB Local
 ```bash
   serverless dynamodb install
 ```
-
-Download [Java Runtime Engine](https://www.java.com/en/download/manual.jsp) in order to run DynamoDB locally. [Issue comment](https://github.com/99x/serverless-dynamodb-local/issues/210#issuecomment-486700221)
 
 Uncomment `region` and `endpoint` in `db.js`
 
