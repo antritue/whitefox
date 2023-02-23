@@ -1,4 +1,4 @@
-const get = require('../src/functions/get')
+const get = require('../../src/functions/get')
 const eventGenerator = require('./eventGenerator')
 
 module.exports.getTest = () =>{
@@ -6,13 +6,11 @@ module.exports.getTest = () =>{
     describe('should get all items in table', () => {
 
         test('body should be defined', async () => {
-    
             const event = eventGenerator({
                 pathParametersObject: {
                     id: "1"
                 }
             });
-    
             const res = await get.get(event)
             expect(res).toBeDefined()
         })
@@ -23,7 +21,6 @@ module.exports.getTest = () =>{
                     id: "1"
                 }
             });
-    
             const res = await get.get(event)
             expect(res.statusCode).toBe(200)
         })
@@ -34,7 +31,6 @@ module.exports.getTest = () =>{
                     id: '2'
                 }
             });
-    
             const res = await get.get(event)
             expect(res.statusCode).toBe(404)
         })

@@ -1,11 +1,10 @@
-const create = require('../src/functions/create')
+const create = require('../../src/functions/create')
 const eventGenerator = require('./eventGenerator')
 
 module.exports.createTest = () => {
   describe('should insert item into table', () => {
 
     test('body should be defined', async () => {
-
       const event = eventGenerator({
         body: {
           id: '1',

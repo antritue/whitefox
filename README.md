@@ -180,10 +180,6 @@ Set up ENV variable for DynamoDB in terminal
 ```bash
   $env:TABLE_NAME='device-table'
 ```
-Start DynamoDB locally
-```bash
-  serverless dynamodb start -p 8000
-```
 
 To run tests, open another terminal, run the following command
 
